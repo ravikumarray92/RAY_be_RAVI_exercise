@@ -21,6 +21,7 @@ import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+
 public class MembershipsApiTests {
 
     private final MembershipRepository membershipRepository;
@@ -108,6 +109,7 @@ public class MembershipsApiTests {
     void shouldFailToCreateRoleMembershipWhenRoleDoesNotExist() {
         Membership expectedMembership = DEFAULT_MEMBERSHIP();
         expectedMembership.setRole(Role.builder().id(UUID_1).build());
+        mockGetTeamById(mockServer, expectedMembership.getTeamId(), ORDINARY_CORAL_LYNX_TEAM());
 
         createMembership(expectedMembership)
                 .validate(404, format("Role %s not found", UUID_1));

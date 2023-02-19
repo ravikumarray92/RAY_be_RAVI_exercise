@@ -1,6 +1,7 @@
 package com.ecore.roles.web.rest;
 
 import com.ecore.roles.model.Role;
+import com.ecore.roles.service.MembershipsService;
 import com.ecore.roles.service.RolesService;
 import com.ecore.roles.web.RolesApi;
 import com.ecore.roles.web.dto.RoleDto;
@@ -21,6 +22,7 @@ import static com.ecore.roles.web.dto.RoleDto.fromModel;
 public class RolesRestController implements RolesApi {
 
     private final RolesService rolesService;
+    private final MembershipsService membershipsService;
 
     @Override
     @PostMapping(
@@ -29,16 +31,16 @@ public class RolesRestController implements RolesApi {
     public ResponseEntity<RoleDto> createRole(
             @Valid @RequestBody RoleDto role) {
         return ResponseEntity
-                .status(200)
-                .body(fromModel(rolesService.CreateRole(role.toModel())));
+                .status(201)
+                .body(fromModel(rolesService.createRole(role.toModel())));
     }
 
     @Override
-    @PostMapping(
+    @GetMapping(
             produces = {"application/json"})
     public ResponseEntity<List<RoleDto>> getRoles() {
 
-        List<Role> getRoles = rolesService.GetRoles();
+        List<Role> getRoles = rolesService.getRoles();
 
         List<RoleDto> roleDtoList = new ArrayList<>();
 
@@ -53,14 +55,28 @@ public class RolesRestController implements RolesApi {
     }
 
     @Override
-    @PostMapping(
+    @GetMapping(
             path = "/{roleId}",
             produces = {"application/json"})
     public ResponseEntity<RoleDto> getRole(
             @PathVariable UUID roleId) {
         return ResponseEntity
                 .status(200)
-                .body(fromModel(rolesService.GetRole(roleId)));
+                .body(fromModel(rolesService.getRole(roleId)));
+    }
+
+    @Override
+    @GetMapping(
+            path = "/search",
+            produces = {"application/json"})
+    public ResponseEntity<RoleDto> getRoleByUserIdAndTeamId(
+            @RequestParam UUID teamMemberId,
+            @RequestParam UUID teamId) {
+
+        return ResponseEntity
+                .status(200)
+                .body(fromModel(membershipsService.getMembership(teamMemberId, teamId).getRole()));
+
     }
 
 }

@@ -6,6 +6,7 @@ import com.ecore.roles.model.Membership;
 import com.ecore.roles.model.Role;
 import org.assertj.core.util.Lists;
 
+import java.util.List;
 import java.util.UUID;
 
 public class TestData {
@@ -97,6 +98,15 @@ public class TestData {
                 .role(DEVELOPER_ROLE())
                 .userId(UUID_4)
                 .teamId(ORDINARY_CORAL_LYNX_TEAM_UUID)
+                .build();
+    }
+
+    public static Team TEAM() {
+        return Team.builder()
+                .id(DEFAULT_MEMBERSHIP_UUID)
+                .name("DEV TEAM")
+                .teamLeadId(GIANNI_USER_UUID)
+                .teamMemberIds(List.of(GIANNI_USER_UUID))
                 .build();
     }
 
