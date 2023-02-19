@@ -14,8 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static com.ecore.roles.utils.TestData.DEFAULT_MEMBERSHIP;
-import static com.ecore.roles.utils.TestData.DEVELOPER_ROLE;
+import static com.ecore.roles.utils.TestData.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -41,6 +40,7 @@ class MembershipsServiceTest {
     @Test
     public void shouldCreateMembership() {
         Membership expectedMembership = DEFAULT_MEMBERSHIP();
+
         when(roleRepository.findById(expectedMembership.getRole().getId()))
                 .thenReturn(Optional.ofNullable(DEVELOPER_ROLE()));
         when(membershipRepository.findByUserIdAndTeamId(expectedMembership.getUserId(),
@@ -49,6 +49,9 @@ class MembershipsServiceTest {
         when(membershipRepository
                 .save(expectedMembership))
                         .thenReturn(expectedMembership);
+
+        when(teamsService.getTeam(expectedMembership.getTeamId()))
+                .thenReturn(TEAM());
 
         Membership actualMembership = membershipsService.assignRoleToMembership(expectedMembership);
 
@@ -69,14 +72,15 @@ class MembershipsServiceTest {
         when(membershipRepository.findByUserIdAndTeamId(expectedMembership.getUserId(),
                 expectedMembership.getTeamId()))
                         .thenReturn(Optional.of(expectedMembership));
-
+        when(teamsService.getTeam(expectedMembership.getTeamId()))
+                .thenReturn(TEAM());
         ResourceExistsException exception = assertThrows(ResourceExistsException.class,
                 () -> membershipsService.assignRoleToMembership(expectedMembership));
 
         assertEquals("Membership already exists", exception.getMessage());
         verify(roleRepository, times(0)).getById(any());
         verify(usersService, times(0)).getUser(any());
-        verify(teamsService, times(0)).getTeam(any());
+        verify(teamsService, times(1)).getTeam(any());
     }
 
     @Test
